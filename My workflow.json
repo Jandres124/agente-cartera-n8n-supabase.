@@ -1,0 +1,925 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8,
+              "triggerAtMinute": 1
+            },
+            {
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c458cd13-1d6b-4ab4-8291-c46cbc5e5741",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/invoices?select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            },
+            {
+              "name": "=Authorization",
+              "value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "lowercaseHeaders": false
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "88027435-12cd-4e22-8f75-603890357221",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4ae79184-fdd3-41d1-96f4-61a821672eae",
+              "leftValue": "={{ $json[\"due_date\"] }}\n",
+              "rightValue": "={{ new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() }}\n",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "4874a671-56b6-4e4c-8089-854eed0fa057",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json[\"email\"] }}",
+        "subject": "Aviso de factura próxima a vencer",
+        "message": "=Hola {{ $json.name }},<br><br>\n\nTienes una factura pendiente de pago:<br><br>\n\n<b>Número de factura:</b> {{ $json.invoice_number }}<br>\n<b>Monto total:</b> ${{ $json.total_amount }}<br>\n<b>Fecha de vencimiento:</b> {{ $json.due_date }}<br>\n<b>Saldo pendiente:</b> ${{ $json.remaining_balance }}<br>\n<b>Estado:</b> {{ $json.status }}<br><br>\n\nTe recomendamos realizar el pago lo antes posible para evitar cargos adicionales.<br><br>\n\nSaludos,<br>\n<b>Departamento de Cartera</b>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1600,
+        20
+      ],
+      "id": "0e73d451-fb8d-4986-9bb4-2b65042ec047",
+      "name": "Send a message",
+      "webhookId": "c515b872-cc68-46be-99f5-0dd36880cc3e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "dcx1uAEC1xHSP5UV",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/clients?select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            },
+            {
+              "name": "Authorization",
+              "value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        -160
+      ],
+      "id": "8c9f5dd0-4c6f-4c72-97c4-3504f30a20a3",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0c1c8545-0ecd-4582-8368-c9d258e2b549",
+              "name": "name",
+              "value": "={{ $json.name }}\n",
+              "type": "string"
+            },
+            {
+              "id": "b12f6f25-63ab-4c44-8040-351d0073dda5",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "a84ad1ce-9c25-4cb5-9085-33b45d0b6fda",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "3f6b2039-bf7f-4d64-b4f3-5349f4fd7b43",
+              "name": "phone",
+              "value": "={{ $json.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "79ec3e7e-c522-4c08-8fff-351fce20e658",
+              "name": "identification",
+              "value": "={{ $json.identification }}",
+              "type": "string"
+            },
+            {
+              "id": "c435d0d2-3566-49af-b04e-b9acb3967602",
+              "name": "status",
+              "value": "={{ $json.status }}",
+              "type": "string"
+            },
+            {
+              "id": "2cd301a1-df06-4b8e-b02b-461b6252971a",
+              "name": "created_at",
+              "value": "={{ $json.created_at }}",
+              "type": "string"
+            },
+            {
+              "id": "320983a8-d1bb-4a21-b88f-5cf50d55209e",
+              "name": "remaining_balance",
+              "value": "={{ $('HTTP Request').item.json.remaining_balance }}",
+              "type": "number"
+            },
+            {
+              "id": "3123fb1a-db65-47a2-a367-204e8dc496e6",
+              "name": "invoice_number",
+              "value": "={{ $('HTTP Request').item.json.invoice_number }}",
+              "type": "string"
+            },
+            {
+              "id": "ee4ed9d9-187d-4b56-b947-c3029b8ef245",
+              "name": "total_amount",
+              "value": "={{ $('HTTP Request').item.json.total_amount }}",
+              "type": "number"
+            },
+            {
+              "id": "5bd00e6c-c84f-46c4-b40c-c76f46fe58c2",
+              "name": "due_date",
+              "value": "={{ $('HTTP Request').item.json.due_date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1240,
+        -160
+      ],
+      "id": "fa528dd3-6e53-4093-9c64-f94e9e159703",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e1e5fbcc-b848-48ae-9022-d19ebebf315d",
+              "leftValue": "={{ $json[\"email\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1440,
+        -160
+      ],
+      "id": "884b96b9-dead-4f79-bc1c-28c17647f395",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agente-cartera",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        220,
+        360
+      ],
+      "id": "390ecec6-4dd3-4fc6-8c39-7fbc9a718c9c",
+      "name": "Webhook",
+      "webhookId": "d40f2211-4eeb-4a3f-81ba-2447db459d2f"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5e8f6169-f540-4072-90ee-d679b6fd5328",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "¿Cuál es mi saldo pendiente?",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "dd481fb9-430b-4140-8671-1111260a10d8",
+              "leftValue": "=\n{{ $json.body.message }}",
+              "rightValue": "¿Qué facturas tengo vencidas?",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        360
+      ],
+      "id": "6675e1e1-b1f8-499f-b08a-9c48d9eda65c",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "url": "=https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/account_status",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            },
+            {
+              "name": "=parametro_cliente",
+              "value": "client_id = eq.<ID_DEL_CLIENTE>"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        740,
+        320
+      ],
+      "id": "9c4957e5-bcb8-4b2e-8446-3d2b716e27ab",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "279b3eff-81c8-4cbc-94dd-eb7f61efe614",
+              "name": "respuesta",
+              "value": "=Tu saldo pendiente es de.{{ $json.total_due }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        320
+      ],
+      "id": "d4e64fc6-b238-43e6-9972-1bf55cedd5ed",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n \"{{ $json.respuesta }}\": \"Gracias por tu consulta. Recibida correctamente.\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1180,
+        320
+      ],
+      "id": "d45e9910-83c3-44c3-9098-027d01041110",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5df66e89-4b56-4b3a-acf6-75473ba46803",
+              "name": "message",
+              "value": "Lo siento, no entendí tu consulta. Puedes preguntar cosas como \"¿Cuál es mi saldo pendiente?\" o \"¿Qué facturas tengo vencidas?\".",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        760,
+        540
+      ],
+      "id": "db1d6531-faa1-4ebc-b0cb-0cd596f52cc7",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"message\": \"Lo siento, no entendí tu consulta. Puedes escribir: '¿Cuál es mi saldo pendiente?' o '¿Qué facturas tengo vencidas?'.\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1000,
+        540
+      ],
+      "id": "85a25fa7-7b24-43d5-b4be-43cc9dbd202c",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "url": "https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/invoices?select=invoice_number,total_amount,due_date&due_date=lt.2025-07-08&status=eq.unpaid",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        740,
+        180
+      ],
+      "id": "0a7bfc54-6b35-463a-94e3-7a28710753e9",
+      "name": "HTTP Request4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0bd95ea6-eb8e-4368-9e6c-ccd38fd37a0a",
+              "name": "respuesta",
+              "value": "={{    $json.length > 0      ? \"Tienes las siguientes facturas vencidas:\\n\" +        $json.map(f => `• Factura ${f.invoice_number}, $${f.total_amount}, vencida el ${f.due_date}`).join(\"\\n\")      : \"No tienes facturas vencidas.\"  }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        960,
+        180
+      ],
+      "id": "68808223-38d8-450a-b998-00646b1df3a1",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1200,
+        180
+      ],
+      "id": "b86d3caf-3687-4a0b-a6e1-9545e8dd5f4e",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3f378719-c118-490f-b12d-a59d4a3f90a8",
+              "leftValue": "={{$json[\"body\"][\"message\"]}}",
+              "rightValue": "factura",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        520,
+        200
+      ],
+      "id": "a8fe0ea2-34ba-4ca4-899a-21268b246925",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "url": "=https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/account_status\n",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            },
+            {
+              "name": "Authorization",
+              "value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        420,
+        740
+      ],
+      "id": "9eb73b27-93f7-4342-9b6e-e11f1df3f132",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "url": "https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/payments",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        760
+      ],
+      "id": "6d808c1a-318b-4d6f-879c-c63fc34bfc63",
+      "name": "HTTP Request5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ee4b11b1-7c71-48c8-94c0-fe2fca1d16de",
+              "name": "client_id",
+              "value": "={{ $json.client_id }}",
+              "type": "string"
+            },
+            {
+              "id": "7b44d148-e3b6-4a37-b695-dcfd4fb8b0c5",
+              "name": "payment_amount",
+              "value": "={{ $json.payment_amount }}",
+              "type": "number"
+            },
+            {
+              "id": "ced91579-7a77-40de-a7d9-b562d0fc61fb",
+              "name": "payment_date",
+              "value": "={{ $json.payment_date }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        840,
+        740
+      ],
+      "id": "423eb554-003d-4bb2-9856-be029a36372e",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "url": "https://ujlskxydyklrlrdthfga.supabase.co/rest/v1/clients?select=*",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqbHNreHlkeWtscmxyZHRoZmdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE5MjM3NjYsImV4cCI6MjA2NzQ5OTc2Nn0.Ofgf4VpozUG9w0RtVLv_S3W2gFdvueSvjGVtpWFI22Y"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        780
+      ],
+      "id": "778a6646-8cc0-4eb7-8eaf-8d27ea3ce66c",
+      "name": "HTTP Request6"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Confirmación de pago recibido",
+        "message": "=<p>Hola {{$json.nombre || 'cliente'}},</p>  <p>Te confirmamos que hemos recibido tu pago por un valor de <strong>{{ $('HTTP Request5').item.json.payment_amount }}$</strong> el día <strong>{{ $('HTTP Request5').item.json.payment_date }}</strong>.</p>  <p>Gracias por ponerte al día con tu cartera.</p>  <p>Atentamente,<br>Equipo de Cobranzas</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        740
+      ],
+      "id": "fb80ae09-1a1f-44ee-a8ab-06565c1a39c7",
+      "name": "Send a message1",
+      "webhookId": "9b966d2c-5263-493e-ae09-6d64fc93f385",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "KFI5Db9tkp1JtPvq",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-07-07T17:12:13.463-05:00",
+          "Readable date": "July 7th 2025, 5:12:13 pm",
+          "Readable time": "5:12:13 pm",
+          "Day of week": "Monday",
+          "Year": "2025",
+          "Month": "July",
+          "Day of month": "07",
+          "Hour": "17",
+          "Minute": "12",
+          "Second": "13",
+          "Timezone": "America/Bogota (UTC-05:00)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook1": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request5": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request6": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c6d475e7-1d92-411e-b912-96a28c5131ee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f0b48a024b4056eecf9b95b884fd44297a1fb92d24b66d6e64a215599614fb14"
+  },
+  "id": "BvlptDaE7RW5LGZ7",
+  "tags": [
+    {
+      "createdAt": "2025-07-07T22:10:55.386Z",
+      "updatedAt": "2025-07-07T22:10:55.386Z",
+      "id": "acTjmvkp6mJNsUdx",
+      "name": "CRON"
+    }
+  ]
+}

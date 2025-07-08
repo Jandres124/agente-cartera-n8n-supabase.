@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Enviar mensaje al Webhook</title>
+</head>
+<body>
+  <h2>Agente de Cartera</h2>
+  <form id="webhookForm">
+    <label for="client_id">ID del Cliente:</label><br>
+    <input type="text" id="client_id" name="client_id" value="84c9a0bf-09d7-4077-b09f-e0b1ceb43dc6"><br><br>
+
+    <label for="message">Escribe tu consulta:</label><br>
+    <input type="text" id="message" name="message" value="¿Cuál es mi saldo pendiente?"><br><br>
+
+    <button type="submit">Enviar al webhook</button>
+  </form>
+
+  <pre id="response"></pre>
+
+  <script>
+    document.getElementById("webhookForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const message = document.getElementById("message").value;
+      const client_id = document.getElementById("client_id").value;
+
+      const response = await fetch("https://galofre0107.app.n8n.cloud/webhook-test/agente-cartera", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: message,
+          client_id: client_id
+        })
+      });
+
+      const data = await response.text();
+      document.getElementById("response").textContent = data;
+    });
+  </script>
+</body>
+</html>
